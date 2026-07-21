@@ -1,0 +1,6 @@
+{
+  "name": "Pustaka SMAN 3 Tolitoli",
+  "description": "Aplikasi perpustakaan modern Pustaka SMAN 3 Tolitoli dengan manajemen buku, peminjaman, anggota, serta fitur impor dan ekspor data buku format Excel.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
