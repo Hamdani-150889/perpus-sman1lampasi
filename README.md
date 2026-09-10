@@ -2,11 +2,9 @@
 <img 
 </div>
 
-# Run and deploy your AI Studio app
-
+# Run and deploy your app
+Hamdani-150889
 This contains everything you need to run your app locally.
-
-View your app in AI Studio: 
 
 ## Run Locally
 
