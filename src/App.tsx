@@ -16,7 +16,8 @@ import {
   Calendar,
   Settings,
   Bell,
-  LogOut
+  LogOut,
+  Cloud
 } from 'lucide-react';
 import { Book, Member, Borrowing } from './types';
 import { initialBooks, initialMembers, initialBorrowings } from './initialData';
@@ -27,6 +28,14 @@ import BookCatalog from './components/BookCatalog';
 import BorrowingManager from './components/BorrowingManager';
 import MemberManager from './components/MemberManager';
 import Login from './components/Login';
+import CloudConfigModal from './components/CloudConfigModal';
+import { 
+  getSavedCloudUrl, 
+  saveCloudUrl, 
+  getLastSyncTime, 
+  fetchCloudData, 
+  syncToCloud 
+} from './services/cloudStorage';
 
 const getTodayDateStr = () => {
   const d = new Date();
@@ -58,6 +67,12 @@ export default function App() {
   }, []);
   const [activeTab, setActiveTab] = useState<string>('dashboard');
   const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
+
+  // Cloud Database Integration State
+  const [cloudUrl, setCloudUrl] = useState<string>(() => getSavedCloudUrl());
+  const [isCloudModalOpen, setIsCloudModalOpen] = useState<boolean>(false);
+  const [isSyncing, setIsSyncing] = useState<boolean>(false);
+  const [lastSync, setLastSync] = useState<string>(() => getLastSyncTime());
 
   // Authentication State
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(() => {
@@ -144,22 +159,132 @@ export default function App() {
     setMembers(initialM);
     setBorrowings(updatedT);
     localStorage.setItem('lib_borrowings', JSON.stringify(updatedT));
+
+    // Auto-fetch latest data from Google Sheets if cloud URL is configured
+    const savedUrl = getSavedCloudUrl();
+    if (savedUrl) {
+      setIsSyncing(true);
+      fetchCloudData(savedUrl).then(cloudData => {
+        setIsSyncing(false);
+        if (cloudData) {
+          if (cloudData.books && cloudData.books.length > 0) {
+            setBooks(cloudData.books);
+            localStorage.setItem('lib_books', JSON.stringify(cloudData.books));
+          }
+          if (cloudData.members && cloudData.members.length > 0) {
+            setMembers(cloudData.members);
+            localStorage.setItem('lib_members', JSON.stringify(cloudData.members));
+          }
+          if (cloudData.borrowings && cloudData.borrowings.length > 0) {
+            const syncedT = updateBorrowingFinesAndStatus(cloudData.borrowings);
+            setBorrowings(syncedT);
+            localStorage.setItem('lib_borrowings', JSON.stringify(syncedT));
+          }
+          setLastSync(getLastSyncTime());
+        }
+      }).catch(() => {
+        setIsSyncing(false);
+      });
+    }
   }, []);
 
-  // Sync state changes to LocalStorage
+  // Sync state changes to LocalStorage and Cloud
   const saveBooks = (updatedBooks: Book[]) => {
     setBooks(updatedBooks);
     localStorage.setItem('lib_books', JSON.stringify(updatedBooks));
+    if (cloudUrl) {
+      syncToCloud(cloudUrl, { action: 'saveBooks', books: updatedBooks }).then(() => {
+        setLastSync(getLastSyncTime());
+      });
+    }
   };
 
   const saveMembers = (updatedMembers: Member[]) => {
     setMembers(updatedMembers);
     localStorage.setItem('lib_members', JSON.stringify(updatedMembers));
+    if (cloudUrl) {
+      syncToCloud(cloudUrl, { action: 'saveMembers', members: updatedMembers });
+    }
   };
 
   const saveBorrowings = (updatedBorrowings: Borrowing[]) => {
     setBorrowings(updatedBorrowings);
     localStorage.setItem('lib_borrowings', JSON.stringify(updatedBorrowings));
+    if (cloudUrl) {
+      syncToCloud(cloudUrl, { action: 'saveBorrowings', borrowings: updatedBorrowings });
+    }
+  };
+
+  // Cloud action handlers
+  const handleSaveCloudUrl = (newUrl: string) => {
+    saveCloudUrl(newUrl);
+    setCloudUrl(newUrl);
+    if (newUrl.trim()) {
+      setIsSyncing(true);
+      fetchCloudData(newUrl).then(cloudData => {
+        setIsSyncing(false);
+        if (cloudData) {
+          if (cloudData.books && cloudData.books.length > 0) {
+            setBooks(cloudData.books);
+            localStorage.setItem('lib_books', JSON.stringify(cloudData.books));
+          }
+          if (cloudData.members && cloudData.members.length > 0) {
+            setMembers(cloudData.members);
+            localStorage.setItem('lib_members', JSON.stringify(cloudData.members));
+          }
+          if (cloudData.borrowings && cloudData.borrowings.length > 0) {
+            const syncedT = updateBorrowingFinesAndStatus(cloudData.borrowings);
+            setBorrowings(syncedT);
+            localStorage.setItem('lib_borrowings', JSON.stringify(syncedT));
+          }
+          setLastSync(getLastSyncTime());
+        }
+      });
+    }
+  };
+
+  const handlePullFromCloud = async () => {
+    if (!cloudUrl) return;
+    setIsSyncing(true);
+    const data = await fetchCloudData(cloudUrl);
+    setIsSyncing(false);
+    if (data) {
+      if (data.books && data.books.length > 0) {
+        setBooks(data.books);
+        localStorage.setItem('lib_books', JSON.stringify(data.books));
+      }
+      if (data.members && data.members.length > 0) {
+        setMembers(data.members);
+        localStorage.setItem('lib_members', JSON.stringify(data.members));
+      }
+      if (data.borrowings && data.borrowings.length > 0) {
+        const syncedT = updateBorrowingFinesAndStatus(data.borrowings);
+        setBorrowings(syncedT);
+        localStorage.setItem('lib_borrowings', JSON.stringify(syncedT));
+      }
+      setLastSync(getLastSyncTime());
+      alert('Data terbaru berhasil diambil dari Google Sheets!');
+    } else {
+      alert('Gagal mengambil data dari Google Sheets. Pastikan URL benar dan memiliki koneksi internet.');
+    }
+  };
+
+  const handlePushToCloud = async () => {
+    if (!cloudUrl) return;
+    setIsSyncing(true);
+    const ok = await syncToCloud(cloudUrl, {
+      action: 'syncAll',
+      books,
+      members,
+      borrowings
+    });
+    setIsSyncing(false);
+    if (ok) {
+      setLastSync(getLastSyncTime());
+      alert('Semua data berhasil dikirim dan disimpan ke Google Sheets!');
+    } else {
+      alert('Gagal mengirim data ke Google Sheets.');
+    }
   };
 
   // --- BOOK OPERATIONS ---
@@ -359,6 +484,20 @@ export default function App() {
             <span>Hari Ini: {currentDateFormatted}</span>
           </div>
 
+          {/* Cloud Database Status Badge / Button */}
+          <button
+            onClick={() => setIsCloudModalOpen(true)}
+            title={cloudUrl ? "Cloud Database Google Sheets terhubung - Klik untuk pengaturan" : "Mode lokal - Klik untuk hubungkan ke Google Sheets"}
+            className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border text-xs font-semibold transition cursor-pointer ${
+              cloudUrl 
+                ? 'bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border-emerald-200' 
+                : 'bg-amber-50 hover:bg-amber-100 text-amber-700 border-amber-200'
+            }`}
+          >
+            <Cloud size={14} className={isSyncing ? 'animate-bounce text-blue-600' : ''} />
+            <span className="hidden md:inline">{isSyncing ? 'Menyinkron...' : (cloudUrl ? 'Cloud Aktif' : 'Hubungkan Cloud')}</span>
+          </button>
+
           {/* Overdue alert badge */}
           {overdueCount > 0 && (
             <div className="relative cursor-pointer" onClick={() => { setActiveTab('borrowing'); }} title={`${overdueCount} buku terlambat kembali`}>
@@ -459,6 +598,24 @@ export default function App() {
                   {borrowings.filter(b => b.status === 'borrowed' || b.status === 'overdue').length}
                 </span>
               </div>
+            </div>
+
+            {/* Cloud Database Button in Sidebar */}
+            <div className="mt-3">
+              <button
+                onClick={() => setIsCloudModalOpen(true)}
+                className="w-full flex items-center justify-between p-3 bg-gradient-to-r from-blue-50 to-indigo-50 hover:from-blue-100 hover:to-indigo-100 border border-blue-100 rounded-xl text-xs font-semibold text-blue-700 transition cursor-pointer shadow-2xs"
+              >
+                <div className="flex items-center gap-2">
+                  <Cloud size={15} className={cloudUrl ? 'text-emerald-600' : 'text-blue-600'} />
+                  <span>Database Cloud</span>
+                </div>
+                <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-bold ${
+                  cloudUrl ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'
+                }`}>
+                  {cloudUrl ? 'Google Sheets' : 'Lokal'}
+                </span>
+              </button>
             </div>
           </div>
         </aside>
@@ -591,9 +748,21 @@ export default function App() {
 
       {/* Professional Footer */}
       <footer className="bg-white border-t border-slate-100 py-4 px-8 flex flex-col sm:flex-row justify-between items-center text-xs text-slate-400 gap-2 shrink-0">
-        <p>© 2026 Perpustakaan Digital. All rights reserved.</p>
+        <p>© 2026 Pustaka SMAN 1 LAMPASIO. All rights reserved.</p>
         <p>Aplikasi Sirkulasi Buku Mandiri v1.2.0 • Dioptimalkan untuk Kecepatan & Kemudahan Admin</p>
       </footer>
+
+      {/* Cloud Configuration Modal */}
+      <CloudConfigModal
+        isOpen={isCloudModalOpen}
+        onClose={() => setIsCloudModalOpen(false)}
+        cloudUrl={cloudUrl}
+        onSaveUrl={handleSaveCloudUrl}
+        onPullFromCloud={handlePullFromCloud}
+        onPushToCloud={handlePushToCloud}
+        lastSync={lastSync}
+        isSyncing={isSyncing}
+      />
     </div>
   );
 }
