@@ -20,11 +20,13 @@ export interface CloudFetchResult {
   borrowings?: Borrowing[];
 }
 
+export const DEFAULT_CLOUD_URL = 'https://script.google.com/macros/s/AKfycbyPwTHsT-ZVYybzlUco-6S2MlZrgj_A-8YbUx84ME76OiUQg1RU0bRL3N4ug9HkOEzF/exec';
+
 /**
  * Mendapatkan URL Google Apps Script yang tersimpan
  */
 export function getSavedCloudUrl(): string {
-  return localStorage.getItem(CLOUD_URL_STORAGE_KEY) || '';
+  return localStorage.getItem(CLOUD_URL_STORAGE_KEY) || DEFAULT_CLOUD_URL;
 }
 
 /**
@@ -108,6 +110,15 @@ export async function testCloudConnection(url: string): Promise<{ success: boole
   }
 }
 
+function cleanDateStr(val: any): string {
+  if (!val) return '';
+  const str = String(val);
+  if (str.includes('T')) {
+    return str.split('T')[0];
+  }
+  return str;
+}
+
 /**
  * Mengambil data terbaru dari Google Sheets
  */
@@ -125,7 +136,28 @@ export async function fetchCloudData(url: string): Promise<CloudFetchResult | nu
 
     if (json && json.status === 'success' && json.data) {
       recordLastSyncTime();
-      return json.data;
+
+      const books = (json.data.books || []).map((b: any) => ({
+        ...b,
+        stock: Number(b.stock) || 1,
+        availableStock: Number(b.availableStock) || 1,
+        createdAt: cleanDateStr(b.createdAt)
+      }));
+
+      const members = (json.data.members || []).map((m: any) => ({
+        ...m,
+        joinDate: cleanDateStr(m.joinDate)
+      }));
+
+      const borrowings = (json.data.borrowings || []).map((t: any) => ({
+        ...t,
+        borrowDate: cleanDateStr(t.borrowDate),
+        dueDate: cleanDateStr(t.dueDate),
+        returnDate: cleanDateStr(t.returnDate) || null,
+        fine: Number(t.fine) || 0
+      }));
+
+      return { books, members, borrowings };
     }
     return null;
   } catch (e) {
