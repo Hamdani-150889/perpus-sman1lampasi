@@ -319,7 +319,7 @@ export default function App() {
             <Library size={20} />
           </div>
           <div>
-            <h1 className="text-lg font-bold text-slate-800 tracking-tight leading-none">Pustaka SMAN 3 Tolitoli</h1>
+            <h1 className="text-lg font-bold text-slate-800 tracking-tight leading-none">Perpus SMAN 1 Lampasi</h1>
             <span className="text-[10px] font-semibold text-blue-600 tracking-wider uppercase">Panel Admin & Sirkulasi</span>
           </div>
         </div>

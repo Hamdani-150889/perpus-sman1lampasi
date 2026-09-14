@@ -82,7 +82,7 @@ export default function BookCatalog({
       const worksheet = XLSX.utils.json_to_sheet(worksheetData);
       const workbook = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(workbook, worksheet, 'Katalog Buku');
-      XLSX.writeFile(workbook, 'Katalog_Buku_SMAN3Tolitoli.xlsx');
+      XLSX.writeFile(workbook, 'Katalog_Buku_SMAN1Lampasi.xlsx');
     } catch (error) {
       console.error('Gagal mengekspor Excel:', error);
       alert('Gagal mengekspor data ke Excel!');
@@ -192,7 +192,7 @@ export default function BookCatalog({
       const worksheet = XLSX.utils.json_to_sheet(templateData);
       const workbook = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(workbook, worksheet, 'Templat Impor Buku');
-      XLSX.writeFile(workbook, 'Templat_Impor_Buku_SMAN3Tolitoli.xlsx');
+      XLSX.writeFile(workbook, 'Templat_Impor_Buku_SMAN1Lampasi.xlsx');
     } catch (error) {
       console.error(error);
       alert('Gagal mengunduh templat Excel.');
@@ -284,7 +284,7 @@ export default function BookCatalog({
         <div>
           <h2 className="text-xl font-bold text-slate-800 flex items-center gap-2">
             <BookMarked className="text-blue-600" size={24} />
-            Katalog Buku SMAN 3 Tolitoli
+            Katalog Buku Perpus SMAN 1 Lampasi
           </h2>
           <p className="text-xs text-slate-500 mt-1">Kelola sirkulasi, serta impor & ekspor data buku format Excel secara instan.</p>
         </div>

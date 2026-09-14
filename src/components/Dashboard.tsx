@@ -87,7 +87,7 @@ export default function Dashboard({
           <BookOpen size={240} />
         </div>
         <div className="relative z-10 max-w-2xl">
-          <h1 className="text-2xl md:text-3xl font-bold tracking-tight">Selamat Datang di Pustaka SMAN 3 Tolitoli!</h1>
+          <h1 className="text-2xl md:text-3xl font-bold tracking-tight">Selamat Datang di Perpus SMAN 1 Lampasi!</h1>
           <p className="mt-2 text-blue-100 font-normal text-sm md:text-base leading-relaxed">
             Kelola katalog buku, lacak peminjaman siswa, dan pantau status pengembalian dengan cepat
           </p>
