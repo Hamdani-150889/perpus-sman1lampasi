@@ -34,7 +34,9 @@ const CATEGORIES = [
   'Pengembangan Diri',
   'Bisnis & Keuangan',
   'Sejarah & Budaya',
-  'Sains & Teknologi'
+  'Sains & Teknologi',
+  'Pelajaran',
+  'Paket'
 ];
 
 const COVER_GRADIENTS = [
@@ -71,6 +73,7 @@ export default function BookCatalog({
         'ID Buku': book.id,
         'Judul': book.title,
         'Penulis': book.author,
+        'Penerbit': book.publisher,
         'Kategori': book.category,
         'ISBN': book.isbn,
         'Total Stok': book.stock,
@@ -121,6 +124,7 @@ export default function BookCatalog({
         const importedBooksList = jsonData.map((row: any) => {
           const title = String(row['Judul'] || row['title'] || row['Judul Buku'] || '').trim();
           const author = String(row['Penulis'] || row['author'] || row['Pengarang'] || '').trim();
+          const publisher = String(row['Penerbit'] || row['publisher'] || '').trim();
           const categoryRaw = String(row['Kategori'] || row['category'] || 'Sastra & Novel').trim();
           
           // Match category with valid categories or default
@@ -141,13 +145,14 @@ export default function BookCatalog({
             id,
             title,
             author,
+            publisher,
             category,
             isbn,
             stock,
             description,
             coverColor: randomGrad
           };
-        }).filter(b => b.title && b.author);
+        }).filter(b => b.title && b.author && b.publisher);
 
         if (importedBooksList.length === 0) {
           alert('Tidak ada data buku valid untuk diimpor. Pastikan kolom Judul dan Penulis terisi.');
@@ -173,6 +178,7 @@ export default function BookCatalog({
           'ID Buku': 'B-001',
           'Judul': 'Laskar Pelangi',
           'Penulis': 'Andrea Hirata',
+          'Penerbit': 'Bentang Pustaka',
           'Kategori': 'Sastra & Novel',
           'ISBN': '978-979-3062-79-1',
           'Total Stok': 5,
@@ -182,6 +188,7 @@ export default function BookCatalog({
           'ID Buku': '',
           'Judul': 'Sains Masa Depan',
           'Penulis': 'Prof. Handoko',
+          'Penerbit': 'PT Gramedia',
           'Kategori': 'Sains & Teknologi',
           'ISBN': '978-602-1234-56-7',
           'Total Stok': 3,
@@ -206,6 +213,7 @@ export default function BookCatalog({
   const [newBook, setNewBook] = useState({
     title: '',
     author: '',
+    publisher: '',
     category: CATEGORIES[0],
     isbn: '',
     stock: 3,
@@ -217,6 +225,7 @@ export default function BookCatalog({
     setNewBook({
       title: '',
       author: '',
+      publisher: '',
       category: CATEGORIES[0],
       isbn: '',
       stock: 3,
@@ -228,8 +237,8 @@ export default function BookCatalog({
   // Handle Add Submit
   const handleAddSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newBook.title.trim() || !newBook.author.trim() || !newBook.isbn.trim()) {
-      alert('Harap isi judul, penulis, dan nomor ISBN!');
+    if (!newBook.title.trim() || !newBook.author.trim() || !newBook.publisher.trim() || !newBook.isbn.trim()) {
+      alert('Harap isi judul, penulis, penerbit, dan nomor ISBN!');
       return;
     }
     onAddBook({
@@ -244,8 +253,8 @@ export default function BookCatalog({
   const handleEditSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!editingBook) return;
-    if (!editingBook.title.trim() || !editingBook.author.trim() || !editingBook.isbn.trim()) {
-      alert('Harap isi judul, penulis, dan nomor ISBN!');
+    if (!editingBook.title.trim() || !editingBook.author.trim() || !editingBook.publisher.trim() || !editingBook.isbn.trim()) {
+      alert('Harap isi judul, penulis, penerbit, dan nomor ISBN!');
       return;
     }
     
@@ -553,6 +562,19 @@ export default function BookCatalog({
                 </div>
               </div>
 
+              {/* Publisher */}
+              <div className="space-y-1">
+                <label className="text-xs font-bold text-slate-600 uppercase tracking-wider">Penerbit *</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="Nama penerbit..."
+                  value={newBook.publisher}
+                  onChange={(e) => setNewBook({...newBook, publisher: e.target.value})}
+                  className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                />
+              </div>
+
               {/* Category, Stock, and Cover style */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1">
@@ -692,6 +714,19 @@ export default function BookCatalog({
                     className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 font-mono"
                   />
                 </div>
+              </div>
+
+              {/* Publisher */}
+              <div className="space-y-1">
+                <label className="text-xs font-bold text-slate-600 uppercase tracking-wider">Penerbit *</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="Nama penerbit..."
+                  value={editingBook.publisher}
+                  onChange={(e) => setEditingBook({...editingBook, publisher: e.target.value})}
+                  className="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                />
               </div>
 
               {/* Category, Stock, and Cover style */}

@@ -42,7 +42,7 @@ function doGet(e) {
     
     // 1. Ambil Data Buku
     var bookSheet = getOrCreateSheet(ss, "Buku", [
-      "id", "title", "author", "category", "isbn", "stock", "availableStock", "description", "coverColor", "createdAt"
+      "id", "title", "author", "publisher", "category", "isbn", "stock", "availableStock", "description", "coverColor", "createdAt"
     ]);
     var books = getSheetDataAsJson(bookSheet);
 
@@ -99,7 +99,7 @@ function doPost(e) {
     // Simpan Buku jika ada
     if (action === "syncAll" || action === "saveBooks") {
       if (postData.books && Array.isArray(postData.books)) {
-        var bookHeaders = ["id", "title", "author", "category", "isbn", "stock", "availableStock", "description", "coverColor", "createdAt"];
+        var bookHeaders = ["id", "title", "author", "publisher", "category", "isbn", "stock", "availableStock", "description", "coverColor", "createdAt"];
         var bookSheet = getOrCreateSheet(ss, "Buku", bookHeaders);
         replaceSheetData(bookSheet, bookHeaders, postData.books);
       }
