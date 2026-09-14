@@ -28,9 +28,34 @@ import BorrowingManager from './components/BorrowingManager';
 import MemberManager from './components/MemberManager';
 import Login from './components/Login';
 
-const TODAY_STR = '2026-07-18'; // Simulated system current date
+const getTodayDateStr = () => {
+  const d = new Date();
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
+const formatIndonesianDate = (d: Date) => {
+  return new Intl.DateTimeFormat('id-ID', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric'
+  }).format(d);
+};
 
 export default function App() {
+  const [currentDateFormatted, setCurrentDateFormatted] = useState<string>(() => {
+    return formatIndonesianDate(new Date());
+  });
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentDateFormatted(formatIndonesianDate(new Date()));
+    }, 1000 * 60);
+    return () => clearInterval(timer);
+  }, []);
   const [activeTab, setActiveTab] = useState<string>('dashboard');
   const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
 
@@ -57,12 +82,14 @@ export default function App() {
 
   // Helper to sync fines and overdue status on startup or reload
   const updateBorrowingFinesAndStatus = (records: Borrowing[]): Borrowing[] => {
-    const today = new Date(TODAY_STR);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
     return records.map(record => {
       if (record.returnDate) {
         return record; // fine is fixed once returned
       }
       const dueDate = new Date(record.dueDate);
+      dueDate.setHours(0, 0, 0, 0);
       if (today > dueDate) {
         const diffTime = today.getTime() - dueDate.getTime();
         const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
@@ -142,7 +169,7 @@ export default function App() {
       ...bookData,
       id: newId,
       availableStock: bookData.stock, // Initially available stock equals total stock
-      createdAt: TODAY_STR
+      createdAt: getTodayDateStr()
     };
     saveBooks([...books, newBook]);
   };
@@ -214,7 +241,7 @@ export default function App() {
           availableStock: Number(importedBook.stock) || 1,
           description: importedBook.description || '',
           coverColor: importedBook.coverColor || 'from-blue-500 to-indigo-600',
-          createdAt: TODAY_STR
+          createdAt: getTodayDateStr()
         });
         addedCount++;
       }
@@ -230,7 +257,7 @@ export default function App() {
     const newMember: Member = {
       ...memberData,
       id: newId,
-      joinDate: TODAY_STR
+      joinDate: getTodayDateStr()
     };
     saveMembers([...members, newMember]);
   };
@@ -274,7 +301,7 @@ export default function App() {
         bookIdToIncrement = b.bookId;
         return {
           ...b,
-          returnDate: TODAY_STR,
+          returnDate: getTodayDateStr(),
           status: 'returned' as const,
         };
       }
@@ -326,10 +353,10 @@ export default function App() {
 
         {/* Right tools (Status date, info and logout) */}
         <div className="flex items-center gap-3">
-          {/* Simulated current system date */}
+          {/* Real-time system date */}
           <div className="hidden sm:flex items-center gap-1.5 bg-blue-50 text-blue-700 px-3 py-1.5 rounded-xl border border-blue-100 text-xs font-semibold">
             <Calendar size={14} />
-            <span>Hari Ini: 18 Juli 2026</span>
+            <span>Hari Ini: {currentDateFormatted}</span>
           </div>
 
           {/* Overdue alert badge */}

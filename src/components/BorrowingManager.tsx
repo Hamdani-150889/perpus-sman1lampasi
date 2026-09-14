@@ -43,22 +43,32 @@ export default function BorrowingManager({
   const [selectedBookId, setSelectedBookId] = useState('');
   const [selectedMemberId, setSelectedMemberId] = useState('');
   
-  // Default dates: Today is 2026-07-18
-  const TODAY_STR = '2026-07-18';
-  const getFutureDateStr = (days: number) => {
-    const d = new Date(TODAY_STR);
-    d.setDate(d.getDate() + days);
-    return d.toISOString().split('T')[0];
+  // Default dates: Real-time dynamic date
+  const getTodayStr = () => {
+    const d = new Date();
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
   };
 
-  const [borrowDate, setBorrowDate] = useState(TODAY_STR);
+  const getFutureDateStr = (days: number, baseDate?: string) => {
+    const d = baseDate ? new Date(baseDate) : new Date();
+    d.setDate(d.getDate() + days);
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
+  const [borrowDate, setBorrowDate] = useState(getTodayStr());
   const [dueDate, setDueDate] = useState(getFutureDateStr(7));
 
   // Reset form
   const resetForm = () => {
     setSelectedBookId('');
     setSelectedMemberId('');
-    setBorrowDate(TODAY_STR);
+    setBorrowDate(getTodayStr());
     setDueDate(getFutureDateStr(7));
   };
 
