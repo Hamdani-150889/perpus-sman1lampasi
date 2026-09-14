@@ -80,7 +80,7 @@ export default function Login({ onLogin }: LoginProps) {
             <div className="p-3 bg-white/10 backdrop-blur-md rounded-2xl mb-4 shadow-inner ring-1 ring-white/20">
               <Library size={32} className="text-white animate-pulse" />
             </div>
-            <h1 className="text-xl sm:text-2xl font-bold tracking-tight">Perpus SMAN 1 Lampasi</h1>
+            <h1 className="text-xl sm:text-2xl font-bold tracking-tight">Pustaka SMAN 1 LAMPASIO</h1>
             <p className="text-xs text-blue-100 mt-1.5 font-medium max-w-xs">
               Sistem Informasi & Manajemen Perpustakaan Sekolah Modern
             </p>
@@ -194,7 +194,7 @@ export default function Login({ onLogin }: LoginProps) {
           <div className="bg-blue-50/70 border border-blue-100 rounded-xl p-4 space-y-2 text-xs">
             <div className="flex items-center gap-2 text-blue-800 font-bold">
               <ShieldCheck size={14} className="shrink-0" />
-              <span>Gunakan Akun Default SMAN 1 Lampasi</span>
+              <span>Gunakan Akun Default SMAN 1 LAMPASIO</span>
             </div>
             <p className="text-blue-700/80 leading-relaxed">
               Untuk kebutuhan demonstrasi, silakan klik tombol di bawah ini atau gunakan kredensial berikut:
@@ -224,7 +224,7 @@ export default function Login({ onLogin }: LoginProps) {
         {/* School Footer info */}
         <div className="bg-slate-50 border-t border-slate-100 px-6 py-4 text-center">
           <p className="text-[10px] text-slate-400 font-medium">
-            Perpus SMAN 1 Lampasi © 2026 • Dirancang untuk Efisiensi
+            Pustaka SMAN 1 LAMPASIO © 2026 • Dirancang untuk Efisiensi
           </p>
         </div>
       </div>

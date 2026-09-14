@@ -1,6 +1,6 @@
 # perpus-sman1lampasi
 
-Sistem Informasi & Manajemen Perpustakaan Modern untuk SMAN 1 Lampasi.
+Sistem Informasi & Manajemen Perpustakaan Modern untuk Pustaka SMAN 1 LAMPASIO.
 
 Repository: [https://github.com/Hamdani-150889/perpus-sman1lampasi](https://github.com/Hamdani-150889/perpus-sman1lampasi)
 

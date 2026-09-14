@@ -1,6 +1,6 @@
 {
-  "name": "Perpus SMAN 1 Lampasi",
-  "description": "Aplikasi perpustakaan modern Perpus SMAN 1 Lampasi dengan manajemen buku, peminjaman, anggota, serta fitur impor dan ekspor data buku format Excel.",
+  "name": "Pustaka SMAN 1 LAMPASIO",
+  "description": "Aplikasi perpustakaan modern Pustaka SMAN 1 LAMPASIO dengan manajemen buku, peminjaman, anggota, serta fitur impor dan ekspor data buku format Excel.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }
