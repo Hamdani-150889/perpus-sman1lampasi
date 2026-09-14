@@ -6,8 +6,7 @@ import {
   EyeOff, 
   Library, 
   LogIn, 
-  AlertCircle,
-  ShieldCheck
+  AlertCircle
 } from 'lucide-react';
 
 interface LoginProps {
@@ -25,11 +24,7 @@ export default function Login({ onLogin }: LoginProps) {
   const defaultUsername = 'admin';
   const defaultPassword = 'admin123';
 
-  const handleAutoFill = () => {
-    setUsername(defaultUsername);
-    setPassword(defaultPassword);
-    setError('');
-  };
+
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -190,35 +185,7 @@ export default function Login({ onLogin }: LoginProps) {
             </button>
           </form>
 
-          {/* Quick Info / Demo Account Card */}
-          <div className="bg-blue-50/70 border border-blue-100 rounded-xl p-4 space-y-2 text-xs">
-            <div className="flex items-center gap-2 text-blue-800 font-bold">
-              <ShieldCheck size={14} className="shrink-0" />
-              <span>Gunakan Akun Default SMAN 1 LAMPASIO</span>
-            </div>
-            <p className="text-blue-700/80 leading-relaxed">
-              Untuk kebutuhan demonstrasi, silakan klik tombol di bawah ini atau gunakan kredensial berikut:
-            </p>
-            <div className="grid grid-cols-2 gap-2 text-[11px] pt-1 text-slate-600 bg-white p-2.5 rounded-lg border border-blue-100/50">
-              <div>
-                <span className="block text-slate-400 font-medium">Username:</span>
-                <code className="font-mono font-bold text-blue-600">admin</code>
-              </div>
-              <div>
-                <span className="block text-slate-400 font-medium">Password:</span>
-                <code className="font-mono font-bold text-blue-600">admin123</code>
-              </div>
-            </div>
-            
-            <button
-              type="button"
-              onClick={handleAutoFill}
-              disabled={isLoading}
-              className="w-full mt-2 bg-white hover:bg-blue-50 text-blue-600 py-1.5 rounded-lg text-[11px] font-bold border border-blue-200 transition cursor-pointer"
-            >
-              Klik untuk Isi Kredensial Otomatis
-            </button>
-          </div>
+
         </div>
 
         {/* School Footer info */}
